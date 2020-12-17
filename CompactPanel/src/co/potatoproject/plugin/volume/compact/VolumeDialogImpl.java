@@ -370,15 +370,15 @@ public class VolumeDialogImpl implements VolumeDialog {
         internalInsetsInfo.setTouchableInsets(InternalInsetsInfo.TOUCHABLE_INSETS_REGION);
         View main = mDialog.findViewById(R.id.main);
         int[] mainLocation = new int[2];
-        main.getLocationOnScreen(mainLocation);
-        internalInsetsInfo.touchableRegion.set(new Region(
+        main.getLocationInWindow(mainLocation);
+        internalInsetsInfo.touchableRegion.set(
             mainLocation[0],
             mainLocation[1],
             mainLocation[0] + main.getWidth(),
             mPanelMode == PanelMode.MINI
                 ? mainLocation[1] + main.getHeight()
                 : mainLocation[1] + mDialogView.getHeight()
-        ));
+        );
     };
 
     protected ViewGroup getDialogView() {
@@ -902,7 +902,7 @@ public class VolumeDialogImpl implements VolumeDialog {
         }
 
         initSettingsH();
-        mDialog.getViewTreeObserver().addOnComputeInternalInsetsListener(mInsetsListener);
+	mDialog.getViewTreeObserver().addOnComputeInternalInsetsListener(mInsetsListener);
 
         if(!mShowing && !mDialog.isShown()) {
             mDialogView.setTranslationX(0);
@@ -1002,6 +1002,7 @@ public class VolumeDialogImpl implements VolumeDialog {
         if (!isLandscape() && mPanelMode != PanelMode.MINI)
             animator.translationX((mDialogView.getWidth() / 2.0f)*(isAudioPanelOnLeftSide() ? -1 : 1));
         animator.start();
+	mDialog.getViewTreeObserver().removeOnComputeInternalInsetsListener(mInsetsListener);
         checkODICaptionsTooltip(true);
         mController.notifyVisible(false);
         synchronized (mSafetyWarningLock) {
